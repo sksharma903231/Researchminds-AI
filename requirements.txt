@@ -33,6 +33,7 @@ cuda-toolkit==13.0.3.0
 cv-bridge==4.1.0
 demo-nodes-py==0.33.11
 diagnostic-msgs==5.3.8
+distro==1.9.0
 domain-coordinator==0.12.1
 example-interfaces==0.12.1
 examples-rclpy-executors==0.19.7
@@ -62,8 +63,14 @@ itsdangerous==2.2.0
 Jinja2==3.1.6
 jiter==0.16.0
 joblib==1.5.3
+jsonpatch==1.33
+jsonpointer==3.1.1
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
+langchain-core==1.6.1
+langchain-protocol==0.0.19
+langchain-text-splitters==1.1.2
+langsmith==0.12.1
 laser-geometry==2.7.2
 launch==3.4.11
 launch-ros==0.26.12
@@ -100,6 +107,7 @@ nvidia-nvjitlink==13.3.33
 nvidia-nvshmem-cu13==3.4.5
 nvidia-nvtx==13.0.85
 openai==3.6.0
+orjson==3.12.0
 osrf-pycommon==2.1.7
 packaging==26.3
 pandas==3.0.5
@@ -129,6 +137,7 @@ rcutils==6.7.6
 referencing==0.37.0
 regex==2026.7.19
 requests==2.34.2
+requests-toolbelt==1.0.0
 resource-retriever==3.4.4
 rich==15.0.0
 rmw-dds-common==3.1.1
@@ -214,6 +223,7 @@ stereo-msgs==5.3.8
 streamlit==1.62.0
 sympy==1.14.0
 teleop-twist-keyboard==2.4.1
+tenacity==9.1.4
 tf2-geometry-msgs==0.36.21
 tf2-kdl==0.36.21
 tf2-msgs==0.36.21
@@ -239,9 +249,12 @@ typing-inspection==0.4.4
 typing_extensions==4.16.0
 unique-identifier-msgs==2.5.1
 urllib3==2.7.0
+uuid_utils==0.17.0
 uvicorn==0.52.4
 vision-msgs==4.1.1
 visualization-msgs==5.3.8
 watchdog==6.0.0
 websockets==16.1.1
 xacro==2.1.1
+xxhash==4.0.1
+zstandard==0.25.0
