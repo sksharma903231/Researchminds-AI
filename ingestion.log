@@ -1,0 +1,8 @@
+2026-09-02 22:17:52,101 - INFO - Starting ingestion for 3 files...
+2026-09-02 22:17:52,102 - INFO - Processing: 2410.05779v3.pdf
+2026-09-02 22:17:52,229 - INFO - Successfully processed p_505b33af
+2026-09-02 22:17:52,229 - INFO - Processing: 2212.10496v1.pdf
+2026-09-02 22:17:52,295 - INFO - Successfully processed p_cfc077b2
+2026-09-02 22:17:52,295 - INFO - Processing: 2404.16130v2.pdf
+2026-09-02 22:17:52,384 - INFO - Successfully processed p_dab1b2f2
+2026-09-02 22:17:52,384 - INFO - Ingestion complete. Registry saved to data/processed/papers_metadata.json
