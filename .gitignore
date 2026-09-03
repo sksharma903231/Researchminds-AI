@@ -1,18 +1,16 @@
-#Virtual Environment
+# Environments
 venv/
-
-# Python cache
+env/
 __pycache__/
-*.pyc
-
-# Environment variables
 .env
 
-# VS Code settings
-.vscode/
+# Streamlit Secrets
+.streamlit/secrets.toml
 
-# Generated files
-data/processed/
+# Vector Database (Do not push heavy index files)
+data/vectorstore/
+*.index
+*.json
 
-# Vector indexes
-vector_store/
+# OS Files
+.DS_Store
