@@ -4,5 +4,6 @@ langchain-community
 langchain-groq
 langchain-ollama
 sentence-transformers
+torchvision
 faiss-cpu
 PyMuPDF
