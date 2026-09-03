@@ -2,6 +2,7 @@ streamlit
 langchain
 langchain-community
 langchain-groq
+langchain-ollama
 sentence-transformers
 faiss-cpu
 PyMuPDF
