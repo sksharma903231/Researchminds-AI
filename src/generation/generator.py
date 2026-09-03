@@ -29,7 +29,7 @@ Answer:"""
             if not api_key:
                 raise ValueError("GROQ_API_KEY environment variable is missing.")
             logging.info("Initializing Cloud API (Groq)...")
-            self.llm = ChatGroq(temperature=0.1, model_name="llama-3.1-8b-instant")
+            self.llm = ChatGroq(temperature=0.1, model_name="openai/gpt-oss-20b")
             
         elif self.mode == "local":
             logging.warning("Initializing Local LLM via Ollama. Monitor your VRAM usage closely.")
