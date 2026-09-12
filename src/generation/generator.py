@@ -1,17 +1,16 @@
-import os
 import logging
-from langchain_ollama import OllamaLLM
+import os
+
 from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
+from langchain_ollama import OllamaLLM
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 class AnswerGenerator:
+    """Generate answers from retrieved research-paper context."""
+
     def __init__(self, mode: str = "cloud"):
-        """
-        Initializes the LLM based on the user's selected mode.
-        mode: 'cloud' (Groq/API) or 'local' (Ollama)
-        """
         self.mode = mode
         self.prompt_template = PromptTemplate(
             input_variables=["context", "question"],
@@ -28,12 +27,15 @@ Answer:"""
             api_key = os.getenv("GROQ_API_KEY")
             if not api_key:
                 raise ValueError("GROQ_API_KEY environment variable is missing.")
-            logging.info("Initializing Cloud API (Groq)...")
-            self.llm = ChatGroq(temperature=0.1, model_name="openai/gpt-oss-20b")
+            logger.info("Initializing Groq model.")
+            self.llm = ChatGroq(
+                groq_api_key=api_key,
+                temperature=0.1,
+                model_name="openai/gpt-oss-20b",
+            )
             
         elif self.mode == "local":
-            logging.warning("Initializing Local LLM via Ollama. Monitor your VRAM usage closely.")
-            # Updated to the modern LangChain Ollama integration
+            logger.info("Initializing local Ollama model.")
             self.llm = OllamaLLM(model="llama3", temperature=0.1)
             
         else:
@@ -41,17 +43,7 @@ Answer:"""
 
     def generate(self, context: str, question: str) -> str:
         prompt = self.prompt_template.format(context=context, question=question)
-        logging.info(f"Generating answer using {self.mode} model...")
-        
+        logger.info("Generating answer with %s mode.", self.mode)
+
         response = self.llm.invoke(prompt)
         return response.content if hasattr(response, "content") else response
-
-if __name__ == "__main__":
-    # Test Local Mode
-    generator = AnswerGenerator(mode="local")
-    
-    mock_context = "GraphRAG is a novel approach by Microsoft that uses knowledge graphs."
-    mock_query = "Who developed GraphRAG?"
-    
-    response = generator.generate(mock_context, mock_query)
-    print(f"\nResponse: {response}")

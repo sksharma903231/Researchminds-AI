@@ -1,21 +1,14 @@
 import json
 import logging
-import traceback
 from pathlib import Path
 
-from pdf_loader import extract_text_from_pdf
-from metadata_extractor import extract_metadata
+from src.ingestion.metadata_extractor import extract_metadata
+from src.ingestion.pdf_loader import extract_text_from_pdf
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("ingestion.log"), 
-        logging.StreamHandler()               
-    ]
-)
+logger = logging.getLogger(__name__)
 
-def run_ingestion(papers_dir: str, processed_dir: str):
+def run_ingestion(papers_dir: str, processed_dir: str) -> None:
+    """Extract text and metadata from PDFs into the processed-data directory."""
     papers_path = Path(papers_dir)
     processed_path = Path(processed_dir)
     texts_dir = processed_path / "texts"
@@ -26,25 +19,25 @@ def run_ingestion(papers_dir: str, processed_dir: str):
     pdf_files = list(papers_path.glob("*.pdf"))
     
     if not pdf_files:
-        logging.warning(f"No PDFs found in {papers_dir}")
+        logger.warning("No PDFs found in %s", papers_dir)
         return
 
-    logging.info(f"Starting ingestion for {len(pdf_files)} files...")
+    logger.info("Starting ingestion for %d files...", len(pdf_files))
 
     for pdf_file in pdf_files:
-        logging.info(f"Processing: {pdf_file.name}")
+        logger.info("Processing: %s", pdf_file.name)
         
         try:
             metadata = extract_metadata(pdf_file)
             if not metadata:
-                logging.error(f"Failed to extract metadata for {pdf_file.name}. Skipping.")
+                logger.error("Failed to extract metadata for %s. Skipping.", pdf_file.name)
                 continue
                 
             paper_id = metadata["paper_id"]
             
             text_content = extract_text_from_pdf(pdf_file)
             if not text_content:
-                logging.error(f"Failed to extract text for {pdf_file.name}. Skipping.")
+                logger.error("Failed to extract text for %s. Skipping.", pdf_file.name)
                 continue
 
             text_file_path = texts_dir / f"{paper_id}.txt"
@@ -54,21 +47,23 @@ def run_ingestion(papers_dir: str, processed_dir: str):
             metadata["text_file_path"] = str(text_file_path)
             metadata_registry.append(metadata)
             
-            logging.info(f"Successfully processed {paper_id}")
+            logger.info("Successfully processed %s", paper_id)
 
-        except Exception as e:
-            logging.error(f"Critical error processing {pdf_file.name}: {e}")
-            logging.debug(traceback.format_exc())
+        except (KeyError, OSError, RuntimeError, ValueError):
+            logger.exception("Error processing %s.", pdf_file.name)
 
     registry_path = processed_path / "papers_metadata.json"
     try:
         with open(registry_path, "w", encoding="utf-8") as f:
             json.dump(metadata_registry, f, indent=4)
-        logging.info(f"Ingestion complete. Registry saved to {registry_path}")
-    except Exception as e:
-        logging.error(f"Failed to save metadata registry: {e}")
+        logger.info("Ingestion complete. Registry saved to %s", registry_path)
+    except OSError as error:
+        logger.error("Failed to save metadata registry: %s", error)
 
 if __name__ == "__main__":
+    from src.logging_config import configure_logging
+
+    configure_logging()
     PAPERS_DIR = "data/papers"
     PROCESSED_DIR = "data/processed"
     

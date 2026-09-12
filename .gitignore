@@ -7,10 +7,14 @@ __pycache__/
 # Streamlit Secrets
 .streamlit/secrets.toml
 
+# Runtime logs
+*.log
+
 # Vector Database (Do not push heavy index files)
 data/vectorstore/
 *.index
-*.json
+data/processed/chunks_registry.json
+data/processed/papers_metadata.json
 
 # OS Files
 .DS_Store

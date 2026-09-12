@@ -1,37 +1,70 @@
-# ResearchMinds AI 📚
+# ResearchMinds AI
 
-An end-to-end Retrieval-Augmented Generation (RAG) architecture designed to ingest, vectorize, and query academic research papers. 
+ResearchMinds AI is a V1 Retrieval-Augmented Generation (RAG) prototype for
+querying a local collection of academic PDFs.
 
-This system extracts semantic context using dense vector retrieval and synthesizes highly accurate, source-cited answers using Llama 3. It features a dual-mode generation pipeline, allowing execution entirely offline via local hardware or through high-speed cloud inference.
+## Architecture
 
-## 🏗️ Architecture & Tech Stack
+- Streamlit user interface
+- PyMuPDF PDF text extraction
+- RecursiveCharacterTextSplitter chunking
+- `BAAI/bge-small-en-v1.5` embeddings through SentenceTransformers
+- FAISS local vector index
+- LangChain generation with Ollama (`llama3`) or Groq (`openai/gpt-oss-20b`)
 
-*   **Frontend Interface:** Streamlit
-*   **Vector Database:** FAISS (Local dense vector indexing)
-*   **Embedding Model:** `BAAI/bge-small-en-v1.5` (via SentenceTransformers)
-*   **LLM Orchestration:** LangChain
-*   **Generation Engine (Local):** Ollama (Llama 3 8B)
-*   **Generation Engine (Cloud):** Groq API (`llama-3.1-8b-instant`)
+## Prerequisites
 
-## ⚙️ How It Works
+- Python 3.10 or later
+- Ollama with the `llama3` model for local mode
+- `GROQ_API_KEY` for cloud mode
 
-1.  **Ingestion & Chunking:** PyMuPDF extracts text from academic PDFs, which is recursively split into semantic chunks while maintaining paragraph overlap.
-2.  **Vectorization:** Text chunks are mapped into 384-dimensional mathematical space and indexed into FAISS.
-3.  **Retrieval:** User queries are vectorized and compared against the database to extract the top-K matching semantic contexts.
-4.  **Synthesis:** The retrieved context blocks (along with their original source IDs) are injected into a strict prompt template and fed to the LLM to generate a grounded answer.
+## Installation
 
-## 🚀 Quickstart (Local Deployment)
-
-### 1. Prerequisites
-*   Ubuntu 24.04 LTS (Tested environment)
-*   Python 3.10+
-*   [Ollama](https://ollama.com/) installed and running locally.
-
-### 2. Installation
-Clone the repository and install the dependencies:
 ```bash
-git clone [https://github.com/yourusername/Researchminds-AI.git](https://github.com/yourusername/Researchminds-AI.git)
-cd Researchminds-AI
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+```
+
+For cloud mode, set the API key in your shell without committing it:
+
+```bash
+export GROQ_API_KEY="..."
+```
+
+## Ingest papers and build the index
+
+Place PDFs in `data/papers`, then run these commands from the repository root:
+
+```bash
+python -m src.ingestion.ingest_pipeline
+python -m src.ingestion.chunking_pipeline
+python -m src.vectorstore.build_index
+```
+
+The pipeline writes extracted text and registries to `data/processed` and writes
+the FAISS index and its mapping to `data/vectorstore`.
+
+## Run the application
+
+Run the selectable local/cloud application:
+
+```bash
+streamlit run app.py
+```
+
+Run the cloud-only application:
+
+```bash
+streamlit run app_public.py
+```
+
+## Current limitations
+
+- Retrieval uses a local FAISS index built from the PDFs in `data/papers`.
+- Answers are constrained to the retrieved chunks and show paper IDs rather than
+  formal citations.
+- The project has no automated test suite.
+
+The tracked papers, extracted text, and vector index are the current demo
+corpus. Newly generated logs and processed/index artifacts are ignored by Git.
