@@ -23,15 +23,23 @@ def run_rag(query: str, mode: str = "local") -> None:
     retrieved_chunks = retriever.search(query, top_k=3)
 
     if not retrieved_chunks:
-        logger.error("No chunks were returned; answer generation skipped.")
-        return
+        logger.warning("No chunks were returned; returning unsupported answer.")
+        unsupported = "I do not have enough information in the provided research papers to answer this question."
+        print("\n" + "=" * 50)
+        print("FINAL SYNTHESIZED ANSWER:")
+        print("=" * 50)
+        print(unsupported)
+        print("=" * 50 + "\n")
+        return unsupported
 
     logger.info("Formatting retrieved chunks for generation.")
     context_blocks = []
     for chunk in retrieved_chunks:
+        doc_title = chunk.get("title") or chunk.get("paper_id", "Unknown")
+        page_str = f"Page {chunk['page']}" if chunk.get("page") else "Page N/A"
         context_blocks.append(
-            f"[Source ID: {chunk['paper_id']} - "
-            f"Match Score: {chunk['score']:.4f}]\n{chunk['text']}"
+            f"[Document: {doc_title} | {page_str} | ID: {chunk.get('paper_id')} - "
+            f"Score: {chunk['score']:.4f}]\n{chunk['text']}"
         )
 
     full_context = "\n\n".join(context_blocks)
@@ -44,6 +52,8 @@ def run_rag(query: str, mode: str = "local") -> None:
     print("=" * 50)
     print(final_answer)
     print("=" * 50 + "\n")
+    return final_answer
+
 
 
 if __name__ == "__main__":

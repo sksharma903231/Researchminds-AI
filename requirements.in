@@ -1,0 +1,9 @@
+streamlit
+PyMuPDF
+sentence-transformers
+torch
+faiss-cpu
+langchain-core
+langchain-text-splitters
+langchain-groq
+langchain-ollama

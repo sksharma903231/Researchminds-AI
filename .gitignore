@@ -1,4 +1,5 @@
 # Environments
+.venv/
 venv/
 env/
 __pycache__/
@@ -11,10 +12,22 @@ __pycache__/
 *.log
 
 # Vector Database (Do not push heavy index files)
-data/vectorstore/
 *.index
 data/processed/chunks_registry.json
 data/processed/papers_metadata.json
 
+
+# Testing and Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE and Editor Files
+.idea/
+*.swp
+*.swo
+
 # OS Files
 .DS_Store
+
+

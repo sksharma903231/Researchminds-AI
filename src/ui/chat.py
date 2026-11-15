@@ -38,23 +38,38 @@ def render_chat(mode: str, prompt_placeholder: str) -> None:
                 retrieved_chunks = retriever.search(prompt, top_k=3)
 
                 if not retrieved_chunks:
-                    st.warning("No relevant context found in the database.")
+                    fallback_answer = (
+                        "I do not have enough information in the provided research papers to answer this question."
+                    )
+                    st.info(fallback_answer)
+                    st.session_state.messages.append(
+                        {"role": "assistant", "content": fallback_answer}
+                    )
                     return
 
-                context_blocks = [
-                    f"[Source: {chunk['paper_id']}]\n{chunk['text']}"
-                    for chunk in retrieved_chunks
-                ]
-                answer = generator.generate(
-                    context="\n\n".join(context_blocks), question=prompt
-                )
+                context_blocks = []
+                for chunk in retrieved_chunks:
+                    doc_title = chunk.get("title") or chunk.get("paper_id", "Unknown")
+                    page_str = f"Page {chunk['page']}" if chunk.get("page") else "Page N/A"
+                    score_val = chunk.get("score", 0.0)
+                    context_blocks.append(
+                        f"[Document: {doc_title} | {page_str} | ID: {chunk.get('paper_id')} | Score: {score_val:.4f}]\n{chunk['text']}"
+                    )
+
+                full_context = "\n\n".join(context_blocks)
+                answer = generator.generate(context=full_context, question=prompt)
                 st.markdown(answer)
 
-                with st.expander("View retrieved database chunks"):
-                    for block in context_blocks:
-                        st.text(block)
+                with st.expander("🔍 View Retrieved Sources & Evidence Chunks"):
+                    for i, chunk in enumerate(retrieved_chunks, 1):
+                        doc_title = chunk.get("title") or chunk.get("paper_id", "Unknown")
+                        page_str = f"Page {chunk['page']}" if chunk.get("page") else "Page N/A"
+                        score_val = chunk.get("score", 0.0)
+                        st.markdown(f"**Source {i}: {doc_title} ({page_str})** — *Score: {score_val:.4f}*")
+                        st.text(chunk["text"])
                         st.divider()
 
                 st.session_state.messages.append(
                     {"role": "assistant", "content": answer}
                 )
+

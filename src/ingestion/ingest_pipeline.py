@@ -7,34 +7,41 @@ from src.ingestion.pdf_loader import extract_text_from_pdf
 
 logger = logging.getLogger(__name__)
 
-def run_ingestion(papers_dir: str, processed_dir: str) -> None:
+def run_ingestion(papers_dir: str, processed_dir: str) -> list[dict[str, str | int]]:
     """Extract text and metadata from PDFs into the processed-data directory."""
     papers_path = Path(papers_dir)
     processed_path = Path(processed_dir)
     texts_dir = processed_path / "texts"
-    
+
+    if not papers_path.exists():
+        logger.error("Papers directory does not exist: %s", papers_dir)
+        return []
+
     texts_dir.mkdir(parents=True, exist_ok=True)
-    
-    metadata_registry = []
-    pdf_files = list(papers_path.glob("*.pdf"))
-    
+
+    metadata_registry: list[dict[str, str | int]] = []
+    pdf_files = sorted(
+        set(papers_path.glob("*.pdf")).union(papers_path.glob("*.PDF")),
+        key=lambda p: p.name,
+    )
+
     if not pdf_files:
         logger.warning("No PDFs found in %s", papers_dir)
-        return
+        return []
 
     logger.info("Starting ingestion for %d files...", len(pdf_files))
 
     for pdf_file in pdf_files:
         logger.info("Processing: %s", pdf_file.name)
-        
+
         try:
             metadata = extract_metadata(pdf_file)
             if not metadata:
                 logger.error("Failed to extract metadata for %s. Skipping.", pdf_file.name)
                 continue
-                
+
             paper_id = metadata["paper_id"]
-            
+
             text_content = extract_text_from_pdf(pdf_file)
             if not text_content:
                 logger.error("Failed to extract text for %s. Skipping.", pdf_file.name)
@@ -43,10 +50,10 @@ def run_ingestion(papers_dir: str, processed_dir: str) -> None:
             text_file_path = texts_dir / f"{paper_id}.txt"
             with open(text_file_path, "w", encoding="utf-8") as f:
                 f.write(text_content)
-                
+
             metadata["text_file_path"] = str(text_file_path)
             metadata_registry.append(metadata)
-            
+
             logger.info("Successfully processed %s", paper_id)
 
         except (KeyError, OSError, RuntimeError, ValueError):
@@ -59,6 +66,9 @@ def run_ingestion(papers_dir: str, processed_dir: str) -> None:
         logger.info("Ingestion complete. Registry saved to %s", registry_path)
     except OSError as error:
         logger.error("Failed to save metadata registry: %s", error)
+
+    return metadata_registry
+
 
 if __name__ == "__main__":
     from src.logging_config import configure_logging
