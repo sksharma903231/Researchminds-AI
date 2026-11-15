@@ -1,3 +1,5 @@
+[![ResearchMinds tests](https://github.com/sksharma903231/Researchminds-AI/actions/workflows/tests.yml/badge.svg)](https://github.com/sksharma903231/Researchminds-AI/actions/workflows/tests.yml)
+
 # ResearchMinds AI
 
 ResearchMinds AI is a lightweight Retrieval-Augmented Generation (RAG) research assistant prototype for indexing, searching, and synthesizing insights from academic PDF collections.
